@@ -30,3 +30,13 @@
 *.exe
 *.out
 *.app
+
+build
+
+# Mac shit
+.DS_Store
+
+#IDE shit
+.vscode
+.idea
+
