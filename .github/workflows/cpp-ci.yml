@@ -1,0 +1,53 @@
+name: C++ CI
+
+on:
+  pull_request:
+    branches:
+      - master
+    paths:
+      - '**.cpp'
+      - '**.h'
+
+jobs:
+  build-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v3
+
+    - name: Set up environment
+      run: |
+        echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
+        sudo apt-get update
+        sudo apt-get install -y clang-format cppcheck valgrind
+
+    - name: Install cpplint
+      run: |
+        python3 -m pip install --upgrade pip
+        pip3 install cpplint
+
+    - name: Build with make
+      run: make build
+      working-directory: ${{ env.BRANCH_NAME }}
+
+    - name: Check code format with clang-format
+      run: clang-format -i -style=file *.{cpp,h} --Werror
+      working-directory: ${{ env.BRANCH_NAME }}
+
+    - name: Check with cpplint
+      run: cpplint --recursive .
+      working-directory: ${{ env.BRANCH_NAME }}
+
+    - name: Check with cppcheck
+      run: cppcheck --enable=all --error-exitcode=1 .
+      working-directory: ${{ env.BRANCH_NAME }}
+
+    - name: Run with valgrind
+      run: make run
+      working-directory: ${{ env.BRANCH_NAME }}
+      env:
+        VALGRIND_OPTS: --leak-check=full --error-exitcode=1
+      run: |
+        valgrind $VALGRIND_OPTS ./your_executable
+
