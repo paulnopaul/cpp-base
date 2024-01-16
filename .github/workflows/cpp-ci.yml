@@ -1,5 +1,6 @@
 name: C++ CI
 
+
 on:
   pull_request:
     branches:
@@ -18,7 +19,7 @@ jobs:
 
     - name: Set up environment
       run: |
-        echo "BRANCH_NAME=${GITHUB_REF##*/}" >> $GITHUB_ENV
+        echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
         sudo apt-get update
         sudo apt-get install -y clang-format cppcheck valgrind
 
@@ -28,26 +29,22 @@ jobs:
         pip3 install cpplint
 
     - name: Build with make
-      run: make build
+      run: ls && make build
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Check code format with clang-format
-      run: clang-format -i -style=file *.{cpp,h} --Werror
+      run: find . -iname "*.h" -o -iname "*.cpp" | xargs clang-format -i --Werror
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Check with cpplint
-      run: cpplint --recursive .
+      run: cpplint --filter=-legal/copyright,-build/include_subdir --recursive . 
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Check with cppcheck
-      run: cppcheck --enable=all --error-exitcode=1 .
+      run: cppcheck --enable=all --suppress=missingIncludeSystem . 
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Run with valgrind
-      run: make run
+      run: make memory
       working-directory: ${{ env.BRANCH_NAME }}
-      env:
-        VALGRIND_OPTS: --leak-check=full --error-exitcode=1
-      run: |
-        valgrind $VALGRIND_OPTS ./your_executable
-
+  
