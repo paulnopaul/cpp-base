@@ -44,6 +44,10 @@ jobs:
       run: cppcheck --enable=all --suppress=missingIncludeSystem . 
       working-directory: ${{ env.BRANCH_NAME }}
 
+    - name: Run Test
+      run: make test
+      working-directory: ${{ env.BRANCH_NAME }}
+
     - name: Run with valgrind
       run: make memory
       working-directory: ${{ env.BRANCH_NAME }}
