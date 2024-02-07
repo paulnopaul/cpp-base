@@ -21,7 +21,14 @@ jobs:
         echo "BRANCH_NAME=${GITHUB_HEAD_REF:-${GITHUB_REF#refs/heads/}}" >> $GITHUB_ENV
 
         sudo apt-get update
-        sudo apt-get install -y clang-format cppcheck valgrind
+        sudo apt-get install -y clang-format cppcheck valgrind libgtest-dev cmake
+
+    - name: Install gtest
+      run: |
+        cd /usr/src/gtest
+        sudo cmake CmakeLists.txt
+        sudo make
+        sudo cp ./lib/*.a /usr/lib/
 
     - name: Install cpplint
       run: |
