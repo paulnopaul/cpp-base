@@ -21,8 +21,8 @@ format:
 lint: 
 	cpplint --filter=-legal/copyright,-build/include_subdir --recursive . 
 
-check:
-	cppcheck --enable=all --suppress=missingIncludeSystem --checkers-report=out.txt -I src .
+check: clean
+	cppcheck --enable=all --suppress=missingIncludeSystem -I src .
 
 clean:
 	$(RM) -r $(BUILDDIR)
