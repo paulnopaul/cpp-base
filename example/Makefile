@@ -1,50 +1,27 @@
-# Name of the target executable
-TARGET := myapp.out
+BUILDDIR = build
 
-# Source files
-SOURCES := $(wildcard *.cpp)
+# Если изменили имя теста, то надо изменить его и здесь тоже
+TEST_EXEC = $(BUILDDIR)/my_class_test
 
-# Object files
-OBJECTS := $(SOURCES:.cpp=.o)
-
-# Input file
-INPUT := input.txt
-
-# Compiler
-CXX := g++
-
-# Compiler flags
-CXXFLAGS := -Wall -g
-
-# Linker flags
-LDFLAGS :=
-
-# Valgrind options
-VALGRIND_OPTS := --leak-check=full --show-leak-kinds=all --track-origins=yes
-
-# Default make target
 all: build
 
-# Build step
-build: $(TARGET)
+build:
+	cmake -B$(BUILDDIR) -H.
+	$(MAKE) -C $(BUILDDIR)
 
-$(TARGET): $(OBJECTS)
-	$(CXX) $(LDFLAGS) -o $@ $^
+test: build
+	$(TEST_EXEC)
 
-# Compile step for source files
-%.o: %.cpp
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Run step
-run: build
-	./$(TARGET)
-
-# Memory check step
 memory: build
-	valgrind $(VALGRIND_OPTS) ./$(TARGET) < $(INPUT)
+	valgrind --leak-check=full $(TEST_EXEC)
 
-# Clean up
+format: 
+	find . -iname "*.h" -o -iname "*.cpp" | xargs clang-format -i --Werror
+
+lint: 
+	cpplint --filter=-legal/copyright,-build/include_subdir --recursive . 
+
 clean:
-	rm -f $(OBJECTS) $(TARGET)
+	$(RM) -r $(BUILDDIR)
 
-.PHONY: all build run memory clean
+.PHONY: all build test memory format lint check clean 
