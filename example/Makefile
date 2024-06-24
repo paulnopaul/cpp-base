@@ -18,6 +18,7 @@ memory: build
 format: 
 	find . -iname "*.h" -o -iname "*.cpp" | xargs clang-format -i --Werror
 
+# Почему-то ему не нравятся файлы CMakeCCompilerId.c, CMakeCCompilerId.cpp
 lint: 
 	cpplint --filter=-legal/copyright,-build/include_subdir --recursive . 
 

@@ -1,6 +1,17 @@
 #pragma once
 
-class MyClass {
+#include <memory>
+
+class Allocator {
+ private:
+    std::unique_ptr<char[]> ptr;
+    size_t offset = 0;
+    size_t maxSize;
+
  public:
-  int sum(int a, int b);
+    void makeAllocator(size_t maxSize);
+
+    char* alloc(size_t size);
+
+    void reset();
 };
