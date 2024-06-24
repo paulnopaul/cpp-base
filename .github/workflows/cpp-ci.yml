@@ -3,10 +3,10 @@ name: C++ CI
 on:
   pull_request:
     branches:
-      - master
+    - master
     paths:
-      - '**.cpp'
-      - '**.h'
+    - '**.cpp'
+    - '**.h'
 
 jobs:
   build-and-test:
@@ -35,20 +35,12 @@ jobs:
         python3 -m pip install --upgrade pip
         pip3 install cpplint
 
-    - name: Build with make
-      run: ls && make build
-      working-directory: ${{ env.BRANCH_NAME }}
-
-    - name: Check code format with clang-format
-      run: find . -iname "*.h" -o -iname "*.cpp" | xargs clang-format -i --Werror
-      working-directory: ${{ env.BRANCH_NAME }}
-
     - name: Check with cpplint
-      run: cpplint --filter=-legal/copyright,-build/include_subdir --recursive . 
+      run: make lint
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Check with cppcheck
-      run: cppcheck --enable=all --suppress=missingIncludeSystem . 
+      run: make check
       working-directory: ${{ env.BRANCH_NAME }}
 
     - name: Run Test
