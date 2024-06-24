@@ -1,0 +1,36 @@
+CC=g++
+FLAGS=-std=c++20 -Wall -pedantic
+
+all: main
+
+run:
+	./main
+
+build: main
+	g++ -g -Wall -o main main.cpp
+
+main: main.o realization.o
+	$(CC) $(FLAGS) realization.o main.o -o main
+
+main.o: main.cpp interface.hpp
+	$(CC) $(FLAGS)   -c main.cpp
+
+realization.o: realization.cpp interface.hpp
+	$(CC) $(FLAGS)  -c realization.cpp 
+
+tests.o: tests.cpp interface.hpp
+	$(CC) $(FLAGS) -lgtest_main -lgtest -lpthread -c tests.cpp 
+
+
+test: a.out 
+	./a.out
+a.out: tests.cpp 
+	g++ tests.cpp -lgtest_main -lgtest -lpthread ./a.out
+memory:a.out
+	valgrind --leak-check=full ./a.out
+
+clean:
+	rm -f *.o *.out main
+
+format:	
+
